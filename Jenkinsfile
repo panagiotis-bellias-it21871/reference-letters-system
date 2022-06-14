@@ -17,7 +17,7 @@ pipeline {
             steps {
                 // Get the code from the github repository
                 git branch: 'main', credentialsId: 'github-ssh-connection', url: 'git@github.com:panagiotis-bellias-it21871/reference-letters-system.git'
-                sh 'cd reference-letters-system'
+                sh 'cd ~/workspace/reference-letters-system'
                 sh 'git submodule update --init --recursive'
             }
         }
