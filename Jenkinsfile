@@ -45,12 +45,12 @@ pipeline {
         }
 
         stage('Docker Deployment') {
-            environment {
+            //environment {
                 // DB_URL=credentials('docker-db-url')
                 // DOCKER_PASSWORD=credentials('docker-push-secret')
                 // DOCKER_USER=credentials('docker-user')
                 // DOCKER_PREFIX=credentials('docker-prefix-image-fastapi')
-            }
+            //}
             steps {
                 sh '''
                     cd ~/workspace/reference-letters-system/ansible-reference-letter-code
