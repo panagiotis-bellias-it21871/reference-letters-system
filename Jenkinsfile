@@ -1,22 +1,25 @@
 pipeline {
     agent any
-    /*
+
     environment {
+        GIT_SSH_COMMAND = 'ssh -i /var/lib/jenkins/.ssh/id_ed25519_git'
+
+        /*
         FASTAPI_DB_USER=credentials('fastapi-db-user')
         FASTAPI_DB_PASSWD=credentials('fastapi-db-passwd')
         FASTAPI_DB_NAME=credentials('fastapi-db')
 
         KEYCLOAK_DB_USER=credentials('keycloak-db-user')
         KEYCLOAK_DB_PASSWD=credentials('keycloak-db-passwd')
-        KEYCLOAK_DB_NAME=credentials('keycloak-db')
-    }*/
+        KEYCLOAK_DB_NAME=credentials('keycloak-db')*/
+    }
 
     stages {
 
         stage('Build-Checkout'){
             steps {
                 // Get the code from the github repository
-                git branch: 'main', credentialsId: 'github-ssh-connection', url: 'git@github.com:panagiotis-bellias-it21871/reference-letters-system.git'
+                git branch: 'main', url: 'git@github.com:panagiotis-bellias-it21871/reference-letters-system.git'
                 sh 'cd ~/workspace/reference-letters-system'
                 sh 'git submodule update --init --recursive'
             }
