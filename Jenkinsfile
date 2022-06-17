@@ -16,7 +16,7 @@ pipeline {
             steps {
                 sh '''
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
-                    python3.9 -m venv fvenv
+                    python3 -m venv fvenv
                     source fvenv/bin/activate
                     pip install -r requirements.txt
 
