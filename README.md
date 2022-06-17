@@ -25,3 +25,5 @@ and copy the password and paste it in the field.
 Select **Install Suggested Plugins** and when the process is finished register as a new admin user providing credentials you want. Clink on the buttons to get started with Jenkins CI/CD Tool.
 
 We have a job for this main repository.
+
+Go to 'Manage Jenkins' to specify the shell executable as '/bin/bash'
