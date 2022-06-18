@@ -76,7 +76,7 @@ pipeline {
                 KC_REALM=credentials('docker-keycloak-realm')
                 KC_CLIENT_SECRET=credentials('docker-keycloak-client-secret')
                 VUE_APP_BACKEND_URL=credentials('docker-vue-backend-url')
-                VUE_APP_KEYCLOAK_URL=credentials('docker-vue-keycloak-url')
+                VUE_APP_KEYCLOAK_URL=credentials('docker-keycloak-server-url')
 
                 DOCKER_USER=credentials('docker-username')
                 DOCKER_PASSWORD=credentials('docker-push-secret')
@@ -125,7 +125,7 @@ pipeline {
                 KC_REALM=credentials('k8s-keycloak-realm')
                 KC_CLIENT_SECRET=credentials('k8s-keycloak-client-secret')
                 VUE_APP_BACKEND_URL=credentials('k8s-vue-backend-url')
-                VUE_APP_KEYCLOAK_URL=credentials('k8s-vue-keycloak-url')
+                VUE_APP_KEYCLOAK_URL=credentials('k8s-keycloak-server-url')
             }
 
             steps {
