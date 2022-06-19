@@ -66,9 +66,17 @@ services:
       - ./reference-letters-fastapi-server/ref_letters:/usr/data/app
     env_file:
       - reference-letters-fastapi-server/ref_letters/.env
+    healthcheck:
+      test:
+        - CMD
+        - wget -S --spider http://localhost:8000/docs
+      interval: 30s
+      timeout: 30s
+      retries: 3
     depends_on:
-      - postgres_db
-      - keycloak_auth
+      postgres_db:
+        condition: service_healthy
+      keycloak_auth:
   
   vuejs:
     container_name: rl_client_vuejs_app
@@ -84,8 +92,9 @@ services:
       - "80:80"
       # - "443:443"
     depends_on:
-      - fastapi
-      - keycloak_auth
+      fastapi:
+        condition: service_healthy
+      keycloak_auth:
 
 volumes:
   dj_postgres_data:
