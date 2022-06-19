@@ -22,9 +22,9 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 3.1.4.1. [Build stage](#build)  
 3.1.4.2. [Unit Testing stage](#unit-test)  
 3.1.4.3. [Integration Testing stage](#integration-test)  
-3.1.4.4. [Ansible Prerequisites stage](#ansible-prerequisites-stage)
-3.1.4.4. [Docker Deployment](#j-docker)  
-3.1.4.5. [Kubernetes Deployment](#j-k8s)  
+3.1.4.4. [Ansible Prerequisites stage](#ansible-prerequisites-stage)   
+3.1.4.5. [Docker Deployment](#j-docker)  
+3.1.4.6. [Kubernetes Deployment](#j-k8s)  
 3.2. [Deployment with Docker and docker-compose using Ansible](#docker)
 
 ...
@@ -100,9 +100,8 @@ k8s-keycloak-client-secret      The client secret we use for authentication with
 k8s-vue-backend-url             The url where backend application is running in kubernetes
 ```
 
-<a name="jobs"></a>
-#### Create Jobs
-* [Create Freestyle project for Ansible code](https://www.guru99.com/create-builds-jenkins-freestyle-project.html)
+<a name="job"></a>
+#### Create Job
 * [More for Ansible](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code)
 * [Create Pipeline project](https://www.jenkins.io/doc/pipeline/tour/hello-world/)
 * [Add Webhooks to job - see until Step 9](https://www.blazemeter.com/blog/how-to-integrate-your-github-repository-to-your-jenkins-project)
@@ -139,3 +138,28 @@ will use docker-compose module to do docker-compose up the containers according 
 
 So, to deploy our app we need a docker image updated. So we build the images according to [nonroot.Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server/blob/main/nonroot.Dockerfile) and [Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-vuejs-client/blob/master/Dockerfile), we are logging in Github Container Registry* and push the image there to be public available.
 
+<a name="j-k8s"></a>
+##### Kubernetes Deployment
+After we have [configure connection](https://github.com/panagiotis-bellias-it21871/reference-letters-system#connect-kubernetes-cluster-with-local-pc-orand-jenkins-server)
+between jenkins user and our k8s cluster, we update secrets and configmaps using also some Ansible to populate ~/.env values and create all the needed entities such as persistent volume claims, deployments, cluster IPs, ingress,
+services.
+
+Secrets and ConfigMaps could be just prepared from earlier. This is applied to the https ingress, we will see
+later in [SSL configuration](https://github.com/panagiotis-bellias-it21871/reference-letters-system#in-kubernetes-environment)
+
+<a name="docker"></a>
+### Deployment with Docker and docker-compose using Ansible
+In order to be able to use Ansible for automation, there is the [ansible-reference-letter-project](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code). There is installation and usage guide.
+
+Now, In order to deploy our project in Docker environment, we use a playbook that uses an Ansible role to run the application
+with docker-compose according to the [docker-compose.yml](docker-compose.yml). In that file, we have defined three
+services, the postgres container with its volume in order to be able to store data, the keycloak container, the fastapi container and the vuejs container for our
+system taking environmental variables from local .env files (it's ready when we run the playbook from jenkins-server
+where the sensitive values from environmental variables are parametric). The fastapi container is built according
+to the [nonroot.Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server/blob/main/nonroot.Dockerfile) as a nonroot process for safety reasons.
+The vuejs container is built according
+to the [Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-vuejs-client/blob/master/Dockerfile).
+
+For the HTTPS part we will talk about [later](https://github.com/panagiotis-bellias-it21871/reference-letters-system#in-docker-environment).
+
+* [More Details](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#docker)
