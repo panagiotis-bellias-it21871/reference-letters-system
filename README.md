@@ -27,8 +27,6 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 3.1.4.6. [Kubernetes Deployment](#j-k8s)  
 3.2. [Deployment with Docker and docker-compose using Ansible](#docker)
 
-...
-
 <a name="locally"></a>
 ## Setup & Run Projects Locally (Installation)
 
@@ -136,7 +134,7 @@ NOTE: connect to your jenkins vm and do the below line so the test stage can run
 Ansible connects to the docker-vm through ssh and runs a playbook that it will define the sensitive parameters and 
 will use docker-compose module to do docker-compose up the containers according to [docker-compose.yml](docker-compose.yml)
 
-So, to deploy our app we need a docker image updated. So we build the images according to [nonroot.Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server/blob/main/nonroot.Dockerfile) and [Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-vuejs-client/blob/master/Dockerfile), we are logging in Github Container Registry* and push the image there to be public available.
+So, to deploy our app we need a docker image updated. So we build the images according to [nonroot.Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server/blob/main/nonroot.Dockerfile) and [Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-vuejs-client/blob/master/Dockerfile), we are logging in Github Container Registry (we will talk about it later) and push the image there to be public available.
 
 <a name="j-k8s"></a>
 ##### Kubernetes Deployment
