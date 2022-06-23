@@ -76,7 +76,7 @@ services:
     depends_on:
       postgres_db:
         condition: service_healthy
-      keycloak_auth:
+      - keycloak_auth
   
   vuejs:
     container_name: rl_client_vuejs_app
@@ -94,7 +94,7 @@ services:
     depends_on:
       fastapi:
         condition: service_healthy
-      keycloak_auth:
+      - keycloak_auth
 
 volumes:
   dj_postgres_data:

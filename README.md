@@ -30,6 +30,14 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 <a name="locally"></a>
 ## Setup & Run Projects Locally (Installation)
 
+### Clone repository with submodules
+```bash
+git clone 
+git clone https://github.com/panagiotis-bellias-it21871/reference-letters-system.git
+cd reference-letters-system
+git submodule update --init --recursive
+```
+
 For Python FastAPI project see [here](https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server#run-project-locally-installation) and for JavaScript VueJS project see [here](https://github.com/panagiotis-bellias-it21871/reference-letters-vuejs-client#project-setup)
 
 <a name="deployment"></a>
