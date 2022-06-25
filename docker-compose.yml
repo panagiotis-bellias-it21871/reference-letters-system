@@ -26,6 +26,8 @@ services:
     volumes:
       - 'dj_postgres_data:/var/lib/postgresql/data/'
       - './assets/init_db:/docker-entrypoint-initdb.d/'
+    network:
+      - reference_letters_service_network
     restart:
       always
 
@@ -49,6 +51,8 @@ services:
       KEYCLOAK_LOGLEVEL: DEBUG
     ports:
       - "8085:8080"
+    network:
+      - reference_letters_service_network
     depends_on:
       - postgres_db
     restart:
@@ -62,6 +66,8 @@ services:
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
+    network:
+      - reference_letters_service_network
     volumes:
       - ./reference-letters-fastapi-server/ref_letters:/usr/data/app
     env_file:
@@ -90,6 +96,8 @@ services:
     ports:
       - "80:80"
       # - "443:443"
+    network:
+      - reference_letters_service_network
     depends_on:
       - fastapi
       - keycloak_auth
