@@ -96,6 +96,7 @@ docker-keycloak-client-secret   The client secret we use for authentication with
 docker-vue-backend-url          The url where backend application is running in docker
 docker-username                 The username we have in the container registry we use to push images
 docker-push-secret              The secret we have in the container registry we use to push images
+docker-container-registry       The container registry you use (e.g. ghcr.io for Github Container Registry). If you use DockerHub, create it with no value
 docker-backend-prefix-image     The docker image name for the backend application
 docker-frontend-prefix-image    The docker image name for the frontend application
 k8s-db-url                      The database url where our postgres db is running using kubernetes
@@ -169,3 +170,73 @@ to the [Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-lett
 For the HTTPS part we will talk about [later](https://github.com/panagiotis-bellias-it21871/reference-letters-system#in-docker-environment).
 
 * [More Details](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#docker)
+
+<a name="k8s"></a>
+### Deployment with Kubernetes using a piece of Ansible
+
+In order to deploy our project in Kubernetes cluster, we first need to connect to that VM so as to configure a better connection between local PC or jenkins server and deployment vm's:
+
+* [Installing microk8s](https://ubuntu.com/tutorials/install-a-local-kubernetes-with-microk8s#2-deploying-microk8s)
+* Do this trick to write less in terminal
+```bash
+echo "alias k='microk8s.kubectl' " >> ~/.profile
+```
+The permanent alias will be applied only if you reconnect to your VM.
+
+#### Cluster Configuration & Enable Addons
+```bash
+sudo usermod -a -G microk8s <your-username>
+sudo chown -f -R <your-username> ~/.kube
+microk8s enable dns dashboard storage ingress
+microk8s status
+```
+
+#### Connect Kubernetes Cluster with Local PC or/and Jenkins server
+```bash
+# VM's terminal
+k config view --raw > kube-config
+cat kube-config
+
+# Local terminal
+mkdir ~/.kube
+scp <vm-name>:/home/<vm-username>/kube-config ~/.kube/config
+```
+Edit ~/.kube/config to replace the 127.0.0.1 with the VM's public ip and the certificate line in clusters section 
+with the below line (not used this way in a real production environment)
+```bash
+insecure-skip-tls-verify: true
+```
+
+* Don't forget to add a firewall rule for the port specified in the ~/.kube/config file
+With
+```bash
+kubectl get pods
+```
+you can ensure that the connection is established.
+
+If you use CI/CD tool and mostly Jenkins do the following (for better deployment fork the repository to be able to 
+change code where needed):
+```bash
+# Jenkins terminal
+sudo su
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+su jenkins
+cd
+
+# Local terminal
+scp ~/.kube/config <jenkins-vm-name>:/tmp/config
+
+# Jenkins terminal
+mkdir -p .kube
+cp /tmp/config ~/.kube/
+```
+With
+```bash
+kubectl get pods
+```
+you can ensure that the connection is established.
+
+### Kubernetes Entities
+
+Find instructions [here](https://docs.google.com/document/d/1k6Evhb-exS7WoEJLVttFEdrooXi0j45jJ0h6HR88qRc/edit?usp=sharing)

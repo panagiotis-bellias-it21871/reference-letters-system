@@ -80,6 +80,7 @@ pipeline {
 
                 DOCKER_USER=credentials('docker-username')
                 DOCKER_PASSWORD=credentials('docker-push-secret')
+                DOCKER_SERVER=credentials('docker-container-registry')
                 DOCKER_BACKEND_PREFIX=credentials('docker-backend-prefix-image')
                 DOCKER_FRONTEND_PREFIX=credentials('docker-frontend-prefix-image')
             }
@@ -103,7 +104,7 @@ pipeline {
                 sh '''
                     HEAD_COMMIT=$(git rev-parse --short HEAD)
                     TAG=$HEAD_COMMIT-$BUILD_ID
-                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+                    echo $DOCKER_PASSWORD | docker login $DOCKER_SERVER -u $DOCKER_USER --password-stdin
 
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
                     docker build --rm -t $DOCKER_BACKEND_PREFIX -t $DOCKER_BACKEND_PREFIX:$TAG -f nonroot.Dockerfile .
@@ -116,6 +117,7 @@ pipeline {
             }
         }
 
+        /*
         stage('Kubernetes Deployment') {
 
             environment {
@@ -195,6 +197,6 @@ pipeline {
                     echo "Here we have to deploy the system using Helm Charts"
                    '''
             }
-        }
+        }*/
     }
 }
