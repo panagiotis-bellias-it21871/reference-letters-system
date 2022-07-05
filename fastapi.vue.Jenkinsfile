@@ -39,7 +39,7 @@ pipeline {
                 sh '''
                     echo 'FRONT END'
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
-                    npm install
+                    npm install --force
 
                     cp .env.example .env
                     echo $PWD
