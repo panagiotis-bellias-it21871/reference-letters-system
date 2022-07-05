@@ -86,6 +86,25 @@ pipeline {
             }
 
             steps {
+                sh '''
+                    echo 'Building the images...'
+                    cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
+                    docker build --rm -t $DOCKER_BACKEND_PREFIX -t $DOCKER_BACKEND_PREFIX:$TAG -f nonroot.Dockerfile .
+                    cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
+                    docker build --rm -t $DOCKER_FRONTEND_PREFIX:latest -t $DOCKER_FRONTEND_PREFIX:$TAG .
+                    
+                    echo 'Installing grype...'
+                    cd && mkdir .grype
+                    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b ~/.grype
+                    echo 'export PATH="$HOME/.grype:$PATH"' >> ~/.bashrc
+                    source ~/.bashrc
+
+                    echo 'Security scanning...'
+                    grype $DOCKER_BACKEND_PREFIX > grype backend_image_grype_logs.txt
+                    grype $DOCKER_FRONTEND_PREFIX > grype frontend_image_grype_logs.txt
+                    cat grype backend_image_grype_logs.txt | grep 'Critical'
+                    cat grype frontend_image_grype_logs.txt | grep 'Critical'
+                '''
                 sshagent (credentials: ['ssh-docker-vm']) {
                     sh '''
                         cd ~/workspace/reference-letters-system/ansible-reference-letter-code
@@ -107,11 +126,9 @@ pipeline {
                     echo $DOCKER_PASSWORD | docker login $DOCKER_SERVER -u $DOCKER_USER --password-stdin
 
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
-                    docker build --rm -t $DOCKER_BACKEND_PREFIX -t $DOCKER_BACKEND_PREFIX:$TAG -f nonroot.Dockerfile .
                     docker push $DOCKER_BACKEND_PREFIX --all-tags
 
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
-                    docker build --rm -t $DOCKER_FRONTEND_PREFIX:latest -t $DOCKER_FRONTEND_PREFIX:$TAG .
                     docker push $DOCKER_FRONTEND_PREFIX --all-tags
                    '''
             }
