@@ -84,6 +84,8 @@ pipeline {
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
                     docker build --rm -t $DOCKER_FRONTEND_PREFIX:latest -t $DOCKER_FRONTEND_PREFIX:$TAG .
                     
+                    echo 'Add also push commands to help grype do its work!'
+
                     echo 'Installing grype...'
                     cd && mkdir .grype || true
                     curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b ~/.grype
