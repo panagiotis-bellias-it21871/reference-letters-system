@@ -76,6 +76,8 @@ pipeline {
 
             steps {
                 sh '''
+                    HEAD_COMMIT=$(git rev-parse --short HEAD)
+                    TAG=$HEAD_COMMIT-$BUILD_ID
                     echo 'Building the images...'
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
                     docker build --rm -t $DOCKER_BACKEND_PREFIX -t $DOCKER_BACKEND_PREFIX:$TAG -f nonroot.Dockerfile .
@@ -110,8 +112,6 @@ pipeline {
                     '''
                 }
                 sh '''
-                    HEAD_COMMIT=$(git rev-parse --short HEAD)
-                    TAG=$HEAD_COMMIT-$BUILD_ID
                     echo $DOCKER_PASSWORD | docker login $DOCKER_SERVER -u $DOCKER_USER --password-stdin
 
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
