@@ -91,8 +91,8 @@ pipeline {
                     source ~/.bashrc
 
                     echo 'Security scanning...'
-                    grype $DOCKER_BACKEND_PREFIX > grype backend_image_grype_logs.txt
-                    grype $DOCKER_FRONTEND_PREFIX > grype frontend_image_grype_logs.txt
+                    grype $DOCKER_BACKEND_PREFIX:latest > grype backend_image_grype_logs.txt
+                    grype $DOCKER_FRONTEND_PREFIX:latest > grype frontend_image_grype_logs.txt
                     cat grype backend_image_grype_logs.txt | grep 'Critical'
                     cat grype frontend_image_grype_logs.txt | grep 'Critical'
                 '''
