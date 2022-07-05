@@ -56,18 +56,6 @@ pipeline {
             }
         }
 
-        stage('Install Ansible and Docker Prerequisites') {
-            steps {
-                sh '''
-                    apt update
-                    apt install software-properties-common
-                    add-apt-repository --yes --update ppa:ansible/ansible
-                    apt install ansible
-                    ansible-galaxy collection install community.docker
-                  '''
-            }
-        }
-
         stage('Docker Deployment') {
 
             environment {

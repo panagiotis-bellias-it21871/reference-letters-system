@@ -136,7 +136,14 @@ NOTE: connect to your jenkins vm and do the below line so the test stage can run
 
 <a name="ansible-prerequisites"></a>
 ##### Ansible Prerequisites stage
-...
+```bash
+sudo su
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible
+ansible-galaxy collection install community.docker
+```
 
 <a name="j-docker"></a>
 ##### Docker Deployment
