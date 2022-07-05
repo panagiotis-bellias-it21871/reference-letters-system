@@ -33,8 +33,9 @@ pipeline {
 
                     cp ref_letters/.env.example ref_letters/.env
                     rm test.db || true
-                    pytest
+                    
                    '''
+                    // pytest
                 sh '''
                     echo 'FRONT END'
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
