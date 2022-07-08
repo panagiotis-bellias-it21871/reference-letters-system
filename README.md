@@ -32,7 +32,6 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 
 ### Clone repository with submodules
 ```bash
-git clone 
 git clone https://github.com/panagiotis-bellias-it21871/reference-letters-system.git
 cd reference-letters-system
 git submodule update --init --recursive
