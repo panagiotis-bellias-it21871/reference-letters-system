@@ -9,37 +9,47 @@ pipeline {
         AUTH_DB_USER=credentials('auth-psql-user')
         AUTH_DB_PASS=credentials('auth-psql-pass')
         AUTH_DB_NAME=credentials('auth-psql-db')
+
+        DB_URL=credentials('docker-db-url')
+        KC_SERVER_URL=credentials('docker-keycloak-server-url')
+        KC_CLIENT_ID=credentials('docker-keycloak-client-id')
+        KC_REALM=credentials('docker-keycloak-realm')
+        KC_CLIENT_SECRET=credentials('docker-keycloak-client-secret')
+        VUE_APP_BACKEND_URL=credentials('docker-vue-backend-url')
+        VUE_APP_KEYCLOAK_URL=credentials('docker-keycloak-server-url')
     }
 
     stages {
 
         stage('Build'){
             steps {
-                // Get the code from the github repository and its submodules
-                git branch: 'main', url: 'https://github.com/panagiotis-bellias-it21871/reference-letters-system.git'
-                sh 'cd ~/workspace/reference-letters-system'
-                sh 'git submodule update --init --recursive'
+                sh '''
+                    cd ~/workspace/reference-letters-system/ansible-reference-letter-code
+                    ansible-playbook --connection=local --inventory 127.0.0.1, \
+                    --limit 127.0.0.1 playbooks/reference-letters-system-install.yml \
+                    -e BACKEND_DIR='reference-letters-fastapi-server' \
+                    -e FRONTEND_DIR='reference-letters-vuejs-client' \
+                    -e DATABASE_URL=$DB_URL \
+                    -e KC_SERVER_URL=$KC_SERVER_URL \
+                    -e KC_CLIENT_ID=$KC_CLIENT_ID \
+                    -e KC_REALM=$KC_REALM \
+                    -e KC_CLIENT_SECRET=$KC_CLIENT_SECRET \
+                    -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL \
+                    -e VUE_APP_KEYCLOAK_URL=$VUE_APP_KEYCLOAK_URL
+                '''
             }
         }
 
         stage('Unit Testing') {
             steps {
                 sh '''
-                    echo "BACK END"
-                    cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
-                    virtualenv fvenv -p python3
-                    source fvenv/bin/activate
-                    pip install -r requirements.txt
-
-                    cp ref_letters/.env.example ref_letters/.env
-                    rm test.db || true
-                    
+                    echo "BACK END UNIT TESTING"
+                    docker exec -it rl_server_fastapi_app pytest
                    '''
-                    // pytest
+
                 sh '''
-                    echo 'FRONT END'
+                    echo 'FRONT END UNIT TESTING'
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
-                    npm install --force
 
                     cp .env.example .env
                     echo $PWD
@@ -59,14 +69,6 @@ pipeline {
         stage('Docker Deployment') {
 
             environment {
-                DB_URL=credentials('docker-db-url')
-                KC_SERVER_URL=credentials('docker-keycloak-server-url')
-                KC_CLIENT_ID=credentials('docker-keycloak-client-id')
-                KC_REALM=credentials('docker-keycloak-realm')
-                KC_CLIENT_SECRET=credentials('docker-keycloak-client-secret')
-                VUE_APP_BACKEND_URL=credentials('docker-vue-backend-url')
-                VUE_APP_KEYCLOAK_URL=credentials('docker-keycloak-server-url')
-
                 DOCKER_USER=credentials('docker-username')
                 DOCKER_PASSWORD=credentials('docker-push-secret')
                 DOCKER_SERVER=credentials('docker-container-registry')
@@ -114,8 +116,6 @@ pipeline {
                     '''
                 }
                 sh '''
-                    echo $DOCKER_PASSWORD | docker login $DOCKER_SERVER -u $DOCKER_USER --password-stdin
-
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
                     docker push $DOCKER_BACKEND_PREFIX --all-tags
 
