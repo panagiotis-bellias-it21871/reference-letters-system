@@ -33,13 +33,12 @@ pipeline {
 
                     cp ref_letters/.env.example ref_letters/.env
                     rm test.db || true
-                    
+                    pytest
                    '''
-                    // pytest
                 sh '''
                     echo 'FRONT END'
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
-                    npm install --force
+                    npm install
 
                     cp .env.example .env
                     echo $PWD
@@ -81,11 +80,12 @@ pipeline {
                     echo 'Building the images...'
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
                     docker build --rm -t $DOCKER_BACKEND_PREFIX -t $DOCKER_BACKEND_PREFIX:$TAG -f nonroot.Dockerfile .
+                    echo $DOCKER_PASSWORD | docker login $DOCKER_SERVER -u $DOCKER_USER --password-stdin
+                    docker push $DOCKER_BACKEND_PREFIX --all-tags
                     cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
                     docker build --rm -t $DOCKER_FRONTEND_PREFIX:latest -t $DOCKER_FRONTEND_PREFIX:$TAG .
+                    docker push $DOCKER_FRONTEND_PREFIX --all-tags
                     
-                    echo 'Add also push commands to help grype do its work!'
-
                     echo 'Installing grype...'
                     cd && mkdir .grype || true
                     curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b ~/.grype
@@ -113,15 +113,6 @@ pipeline {
                         -e VUE_APP_KEYCLOAK_URL=$VUE_APP_KEYCLOAK_URL
                     '''
                 }
-                sh '''
-                    echo $DOCKER_PASSWORD | docker login $DOCKER_SERVER -u $DOCKER_USER --password-stdin
-
-                    cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
-                    docker push $DOCKER_BACKEND_PREFIX --all-tags
-
-                    cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
-                    docker push $DOCKER_FRONTEND_PREFIX --all-tags
-                   '''
             }
         }
 
