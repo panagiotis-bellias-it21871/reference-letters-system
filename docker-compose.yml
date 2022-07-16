@@ -7,8 +7,8 @@ services:
     image: postgres:14
     expose:
       - 5432
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -29,30 +29,30 @@ services:
     restart:
       always
 
-  keycloak_auth:
-    container_name: rl_security_keycloak_auth
-    image: quay.io/keycloak/keycloak:16.1.1
-    volumes:
-      - ./realm-export.json:/opt/jboss/keycloak/imports/realm-export.json
-    command: 
-     - "-b 0.0.0.0 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.import=/opt/jboss/keycloak/imports/realm-export.json"
-    environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres_db
-      DB_DATABASE: testkeycloakdb
-      DB_USER: testkeycloakuser
-      DB_SCHEMA: public
-      DB_PASSWORD: testkeycloakpassword
-      KEYCLOAK_USER: keycloakuser
-      KEYCLOAK_PASSWORD: keycloakpassword
-      PROXY_ADDRESS_FORWARDING: "true"
-      KEYCLOAK_LOGLEVEL: DEBUG
-    ports:
-      - "8085:8080"
-    depends_on:
-      - postgres_db
-    restart:
-      always
+  # keycloak_auth:
+  #   container_name: rl_security_keycloak_auth
+  #   image: quay.io/keycloak/keycloak:16.1.1
+  #   volumes:
+  #     - ./realm-export.json:/opt/jboss/keycloak/imports/realm-export.json
+  #   command: 
+  #    - "-b 0.0.0.0 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.import=/opt/jboss/keycloak/imports/realm-export.json"
+  #   environment:
+  #     DB_VENDOR: POSTGRES
+  #     DB_ADDR: postgres_db
+  #     DB_DATABASE: testkeycloakdb
+  #     DB_USER: testkeycloakuser
+  #     DB_SCHEMA: public
+  #     DB_PASSWORD: testkeycloakpassword
+  #     KEYCLOAK_USER: keycloakuser
+  #     KEYCLOAK_PASSWORD: keycloakpassword
+  #     PROXY_ADDRESS_FORWARDING: "true"
+  #     KEYCLOAK_LOGLEVEL: DEBUG
+  #   ports:
+  #     - "8085:8080"
+  #   depends_on:
+  #     - postgres_db
+  #   restart:
+  #     always
 
   fastapi:
     container_name: rl_server_fastapi_app
@@ -75,7 +75,7 @@ services:
       retries: 3
     depends_on:
       - postgres_db
-      - keycloak_auth
+      # - keycloak_auth
   
   vuejs:
     container_name: rl_client_vuejs_app
@@ -92,7 +92,7 @@ services:
       # - "443:443"
     depends_on:
       - fastapi
-      - keycloak_auth
+      # - keycloak_auth
 
 volumes:
   dj_postgres_data:
