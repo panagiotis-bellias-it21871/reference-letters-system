@@ -25,7 +25,8 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 3.1.4.4. [Ansible Prerequisites stage](#ansible-prerequisites-stage)   
 3.1.4.5. [Docker Deployment](#j-docker)  
 3.1.4.6. [Kubernetes Deployment](#j-k8s)  
-3.2. [Deployment with Docker and docker-compose using Ansible](#docker)
+3.2. [Deployment with Docker and docker-compose using Ansible](#docker)  
+3.3. [Deployment with Kubernetes using a piece of Ansible](#k8s)
 
 <a name="locally"></a>
 ## Setup & Run Projects Locally (Installation)
@@ -244,4 +245,50 @@ you can ensure that the connection is established.
 
 ### Kubernetes Entities
 
-Find instructions [here](https://docs.google.com/document/d/1k6Evhb-exS7WoEJLVttFEdrooXi0j45jJ0h6HR88qRc/edit?usp=sharing)
+Either manually or via jenkins server using Jenkinsfile and secret texts the following will do the trick! The code is located in the k8s folder of each project, so every time we must change directory to be located in the correct application folder. The code is in the `.yaml` format.
+
+* Don't forget to have the docker images in Github Container Registry because the deployment entities use them. You can follow the logic located in [fastapi.vue.Jenkinsfile](fastapi.vue.Jenkinsfile) in the 'Docker Deployment' stage. You must have docker installed in your local machine (or jenkins server)
+* In projects' README.md files you will find information about the docker image each application is dockerized in.
+
+```bash
+# Secret (for the postgresql database)
+kubectl create secret generic pg-user \
+--from-literal=PGUSER=<put user name here> \
+--from-literal=PGPASSWORD=<put password here> \
+--from-literal=PGDATABASE=<put database name here>
+
+cd reference-letters-fastapi-server
+
+# Config Map (for .env variables)
+cp ref_letters/.env.k8s.example ref_letters/.env
+nano ref_letters/.env # change to the correct values
+kubectl create configmap fastapi-config --from-env-file=ref_letters/.env
+
+cd k8s
+# Persistent Volume Claim
+kubectl apply -f db/postgres-pvc.yaml
+# Deployments
+kubectl apply -f db/postgres-deployment.yaml
+kubectl apply -f fastapi/fastapi-deployment.yaml
+# Services (Cluster IPs)
+kubectl apply -f db/postgres-clip.yaml
+kubectl apply -f fastapi/fastapi-clip.yaml
+
+cd ..
+cd reference-letters-vuejs-client
+
+# Config Map (for .env variables)
+cp .env.k8s.example .env
+nano .env # change to the correct values
+kubectl create configmap vuejs-config --from-env-file=.env
+
+cd k8s
+# Deployments
+kubectl apply -f vuejs/vuejs-deployment.yaml
+# Services (Cluster IPs)
+kubectl apply -f vuejs/vuejs-clip.yaml
+# Ingress (For just HTTP - Edit file changing host to your own dns name)
+kubectl apply -f vuejs/vuejs-ingress.yaml
+```
+
+To change to the correct values the .env file we use some Ansible running [this playbook](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code/blob/main/playbooks/populate-k8s-dotenv.yml). This is also used by Jenkins server and Jenkinsfile. See more [here](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#k8s).
