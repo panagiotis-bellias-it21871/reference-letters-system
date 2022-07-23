@@ -252,11 +252,25 @@ Either manually or via jenkins server using Jenkinsfile and secret texts the fol
 
 ```bash
 # Secret (for the postgresql database)
-kubectl create secret generic pg-user \
+kubectl create secret generic pg-users \
 --from-literal=PGUSER=<put user name here> \
 --from-literal=PGPASSWORD=<put password here> \
---from-literal=PGDATABASE=<put database name here>
+--from-literal=FAUSER=<put backend username here> \
+--from-literal=FAPASSWORD=<put backend password here> \
+--from-literal=FADBNAME=<put backend database name here>
 
+# Config Map (for database initialization)
+kubectl create configmap pg-init-script \
+--from-literal=fastapi.sh=assets/init_db/fastapi.sh
+
+## If you want keycloak service (for now it isn't integrated) run this instead
+kubectl create configmap pg-init-script \
+--from-literal=fastapi.sh=assets/init_db/fastapi.sh \
+--from-literal=keycloak.sh=assets/init_db/keycloak.sh
+
+!# ISSUE with database initialization for now
+
+# Continue from here
 cd reference-letters-fastapi-server
 
 # Config Map (for .env variables)
@@ -274,7 +288,7 @@ kubectl apply -f fastapi/fastapi-deployment.yaml
 kubectl apply -f db/postgres-clip.yaml
 kubectl apply -f fastapi/fastapi-clip.yaml
 
-cd ..
+cd ../..
 cd reference-letters-vuejs-client
 
 # Config Map (for .env variables)
