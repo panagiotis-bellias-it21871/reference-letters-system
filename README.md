@@ -306,3 +306,4 @@ kubectl apply -f vuejs/vuejs-ingress.yaml
 ```
 
 To change to the correct values the .env file we use some Ansible running [this playbook](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code/blob/main/playbooks/populate-k8s-dotenv.yml). This is also used by Jenkins server and Jenkinsfile. See more [here](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#k8s).
+*
