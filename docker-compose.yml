@@ -76,6 +76,8 @@ services:
     depends_on:
       - postgres_db
       # - keycloak_auth
+    restart:
+      always
   
   vuejs:
     container_name: rl_client_vuejs_app
