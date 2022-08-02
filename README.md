@@ -166,7 +166,7 @@ In order to be able to use Ansible for automation, there is the [ansible-referen
 
 Now, In order to deploy our project in Docker environment, we use a playbook that uses an Ansible role to run the application
 with docker-compose according to the [docker-compose.yml](docker-compose.yml). In that file, we have defined three
-services, the postgres container with its volume in order to be able to store data, the keycloak container, the fastapi container and the vuejs container for our
+services, the postgres container with its volume in order to be able to store data, the fastapi container and the vuejs container for our
 system taking environmental variables from local .env files (it's ready when we run the playbook from jenkins-server
 where the sensitive values from environmental variables are parametric). The fastapi container is built according
 to the [nonroot.Dockerfile](https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server/blob/main/nonroot.Dockerfile) as a nonroot process for safety reasons.
@@ -306,3 +306,4 @@ kubectl apply -f vuejs/vuejs-ingress.yaml
 ```
 
 To change to the correct values the .env file we use some Ansible running [this playbook](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code/blob/main/playbooks/populate-k8s-dotenv.yml). This is also used by Jenkins server and Jenkinsfile. See more [here](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#k8s).
+*
