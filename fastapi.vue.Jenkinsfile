@@ -5,10 +5,10 @@ pipeline {
     environment {
         APP_DB_USER=credentials('app-psql-user')
         APP_DB_PASS=credentials('app-psql-pass')
-        APP_DB_NAME=credentials('app-psql-db')
+        APP_DB_NAME=credentials('app-psql-db') /* KeyCloak Stuff
         AUTH_DB_USER=credentials('auth-psql-user')
         AUTH_DB_PASS=credentials('auth-psql-pass')
-        AUTH_DB_NAME=credentials('auth-psql-db')
+        AUTH_DB_NAME=credentials('auth-psql-db') */
     }
 
     stages {
@@ -58,13 +58,13 @@ pipeline {
         stage('Docker Deployment') {
 
             environment {
-                DB_URL=credentials('docker-db-url')
+                DB_URL=credentials('docker-db-url') /* KeyCloak Stuff
                 KC_SERVER_URL=credentials('docker-keycloak-server-url')
                 KC_CLIENT_ID=credentials('docker-keycloak-client-id')
                 KC_REALM=credentials('docker-keycloak-realm')
-                KC_CLIENT_SECRET=credentials('docker-keycloak-client-secret')
-                VUE_APP_BACKEND_URL=credentials('docker-vue-backend-url')
-                VUE_APP_KEYCLOAK_URL=credentials('docker-keycloak-server-url')
+                KC_CLIENT_SECRET=credentials('docker-keycloak-client-secret') */
+                VUE_APP_BACKEND_URL=credentials('docker-vue-backend-url') /* KeyCloak Stuff
+                VUE_APP_KEYCLOAK_URL=credentials('docker-keycloak-server-url') */
 
                 DOCKER_USER=credentials('docker-username')
                 DOCKER_PASSWORD=credentials('docker-push-secret')
@@ -108,28 +108,27 @@ pipeline {
                         -e BACKEND_DIR='reference-letters-fastapi-server' \
                         -e FRONTEND_DIR='reference-letters-vuejs-client' \
                         -e DATABASE_URL=$DB_URL \
+                        -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL
+                    ''' /* KeyCloak Stuff
                         -e KC_SERVER_URL=$KC_SERVER_URL \
                         -e KC_CLIENT_ID=$KC_CLIENT_ID \
                         -e KC_REALM=$KC_REALM \
                         -e KC_CLIENT_SECRET=$KC_CLIENT_SECRET \
-                        -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL \
-                        -e VUE_APP_KEYCLOAK_URL=$VUE_APP_KEYCLOAK_URL
-                    '''
+                        -e VUE_APP_KEYCLOAK_URL=$VUE_APP_KEYCLOAK_URL */
                 }
             }
         }
 
-        /*
         stage('Kubernetes Deployment') {
 
             environment {
-                DB_URL=credentials('k8s-db-url')
+                DB_URL=credentials('k8s-db-url') /* KeyCloak Stuff
                 KC_SERVER_URL=credentials('k8s-keycloak-server-url')
                 KC_CLIENT_ID=credentials('k8s-keycloak-client-id')
                 KC_REALM=credentials('k8s-keycloak-realm')
-                KC_CLIENT_SECRET=credentials('k8s-keycloak-client-secret')
-                VUE_APP_BACKEND_URL=credentials('k8s-vue-backend-url')
-                VUE_APP_KEYCLOAK_URL=credentials('k8s-keycloak-server-url')
+                KC_CLIENT_SECRET=credentials('k8s-keycloak-client-secret') */
+                VUE_APP_BACKEND_URL=credentials('k8s-vue-backend-url') /* KeyCloak Stuff
+                VUE_APP_KEYCLOAK_URL=credentials('k8s-keycloak-server-url') */
             }
 
             steps {
@@ -144,23 +143,12 @@ pipeline {
                     --from-literal=PGDATABASE=$APP_DB_NAME --dry-run -o yaml \
                     | kubectl apply -f -
 
-                    kubectl create secret generic auth-pg-user \
-                    --from-literal=PGUSER=$AUTH_DB_USER \
-                    --from-literal=PGPASSWORD=$AUTH_DB_PASS \
-                    --from-literal=PGDATABASE=$AUTH_DB_NAME --dry-run -o yaml \
-                    | kubectl apply -f -
-
                     cd ~/workspace/reference-letters-system/ansible-reference-letter-code
                     ansible-playbook playbooks/populate-k8s-dotenv.yml \
                     -e BACKEND_DIR='reference-letters-fastapi-server' \
                     -e FRONTEND_DIR='reference-letters-vuejs-client' \
                     -e DATABASE_URL=$DB_URL \
-                    -e KC_SERVER_URL=$KC_SERVER_URL \
-                    -e KC_CLIENT_ID=$KC_CLIENT_ID \
-                    -e KC_REALM=$KC_REALM \
-                    -e KC_CLIENT_SECRET=$KC_CLIENT_SECRET \
-                    -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL \
-                    -e VUE_APP_KEYCLOAK_URL=$VUE_APP_KEYCLOAK_URL
+                    -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL
 
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
                     kubectl create configmap fastapi-config \
@@ -171,9 +159,7 @@ pipeline {
                     kubectl apply -f db/postgres-pvc.yaml
                     kubectl apply -f db/postgres-deployment.yaml
                     kubectl apply -f db/postgres-clip.yaml
-                    kubectl apply -f auth/keycloak-pvc.yaml
-                    kubectl apply -f auth/keycloak-deployment.yaml
-                    kubectl apply -f auth/keycloak-clip.yaml
+                    
                     kubectl apply -f fastapi/fastapi-deployment.yaml
                     kubectl apply -f fastapi/fastapi-clip.yaml
 
@@ -190,6 +176,17 @@ pipeline {
                     kubectl apply -f vuejs/vuejs-https-ingress.yaml
 
                    '''
+                   /* KeyCloak Stuff
+                    kubectl create secret generic auth-pg-user \
+                        --from-literal=PGUSER=$AUTH_DB_USER \
+                        --from-literal=PGPASSWORD=$AUTH_DB_PASS \
+                        --from-literal=PGDATABASE=$AUTH_DB_NAME --dry-run -o yaml \
+                        | kubectl apply -f -
+                    kubectl apply -f auth/keycloak-pvc.yaml
+                    kubectl apply -f auth/keycloak-deployment.yaml
+                    kubectl apply -f auth/keycloak-clip.yaml
+
+                   */
             }
         }
 
@@ -199,6 +196,6 @@ pipeline {
                     echo "Here we have to deploy the system using Helm Charts"
                    '''
             }
-        }*/
+        }
     }
 }
