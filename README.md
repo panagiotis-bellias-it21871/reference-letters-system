@@ -26,7 +26,8 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 3.1.4.5. [Docker Deployment](#j-docker)  
 3.1.4.6. [Kubernetes Deployment](#j-k8s)  
 3.2. [Deployment with Docker and docker-compose using Ansible](#docker)  
-3.3. [Deployment with Kubernetes using a piece of Ansible](#k8s)
+3.3. [Deployment with Kubernetes using a piece of Ansible](#k8s)  
+3.4. [Deployment with Helm Charts](#helm)
 
 <a name="locally"></a>
 ## Setup & Run Projects Locally (Installation)
@@ -307,3 +308,47 @@ kubectl apply -f vuejs/vuejs-ingress.yaml
 
 To change to the correct values the .env file we use some Ansible running [this playbook](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code/blob/main/playbooks/populate-k8s-dotenv.yml). This is also used by Jenkins server and Jenkinsfile. See more [here](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#k8s).
 *
+
+<a name="helm"></a>
+### Deployment with Helm Charts
+
+#### How to install Helm
+```bash
+curl -fsSL -i get_helm.sh \
+https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 # alternatively, use it from this repo
+chmod 700 get_helm.sh
+./get_helm.sh
+helm version
+```
+
+#### How to create the helm chart
+```bash
+helm create referenceLettersSystem
+```
+
+#### Create postgresql secret
+You first have to encrypt your sensitive values like postgres's user and password and application's user and password that accesses our database.
+```bash
+echo -n 'postgres' | base64 # for db's user and password
+echo -n 'bellias' | base64 # for app's user
+echo -n 'pass123' | base64 # for app's password
+echo -n 'reference_letters_data' | base64 # for app's database name
+```
+The output is similar to:
+```vim
+cG9zdGdyZXM=
+YmVsbGlhcw==
+cGFzczEyMw==
+cmVmZXJlbmNlX2xldHRlcnNfZGF0YQ==
+```
+
+So the related file we must create is [secret.yaml](referenceLettersSystem/templates/secret.yaml)
+
+#### Create system configmap
+Here we have the [configmap.yaml](configmap.yaml) that must be configured with your sensitive values both for fastapi and vuejs project
+
+Now the chart can be installed like this:
+```bash
+helm install <some-name> referenceLettersSystem
+# e.g. helm install rl-system referenceLettersSystem 
+```

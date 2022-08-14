@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: referenceLettersSystem-configmap
+data:
+  DATABASE_URL: postgresql://bellias:pass123@pg-cluster-ip/reference_letters_data
+  SECRET: "SECRET"
+  VUE_APP_BACKEND_URL: "http://fastapi-clip:8000/api"
