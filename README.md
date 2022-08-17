@@ -27,6 +27,7 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 3.1.4.6. [Kubernetes Deployment](#j-k8s)  
 3.2. [Deployment with Docker and docker-compose using Ansible](#docker)  
 3.3. [Deployment with Kubernetes using a piece of Ansible](#k8s)  
+3.3.1. [Using Multiple Namespaces](#multiple-namespaces)   
 3.4. [Deployment with Helm Charts](#helm)
 
 <a name="locally"></a>
@@ -308,6 +309,29 @@ kubectl apply -f vuejs/vuejs-ingress.yaml
 
 To change to the correct values the .env file we use some Ansible running [this playbook](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code/blob/main/playbooks/populate-k8s-dotenv.yml). This is also used by Jenkins server and Jenkinsfile. See more [here](https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code#k8s).
 *
+
+<a name="multiple-namespaces"></a>
+#### Using Multiple Namespaces
+A Kubernetes cluster will instantiate a default namespace when provisioning the cluster to hold the default set of Pods, Services, and Deployments used by the cluster.
+
+You can introspect the available namespaces by doing the following:
+```bash
+kubectl get namespaces
+```
+Using a Kubernetes cluster for development and production use cases:
+
+The development team would like to maintain a space in the cluster where they can get a view on the list of Pods, Services, and Deployments they use to build and run their application. In this space, Kubernetes resources come and go, and the restrictions on who can or cannot modify resources are relaxed to enable agile development.
+
+The operations team would like to maintain a space in the cluster where they can enforce strict procedures on who can or cannot manipulate the set of Pods, Services, and Deployments that run the production site.
+
+One pattern we will follow is to partition the Kubernetes cluster into two namespaces: development and production.
+
+Let's create two new namespaces to hold our work.
+
+Create the development namespace using kubectl:
+```bash
+kubectl create -f https://k8s.io/examples/admin/namespace-dev.json
+```
 
 <a name="helm"></a>
 ### Deployment with Helm Charts
