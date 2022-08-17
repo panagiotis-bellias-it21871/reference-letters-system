@@ -333,6 +333,8 @@ Create the development namespace using kubectl:
 kubectl create -f https://k8s.io/examples/admin/namespace-dev.json
 ```
 
+[link](https://kubernetes.io/docs/tasks/administer-cluster/namespaces/#subdividing-your-cluster-using-kubernetes-namespaces)
+
 <a name="helm"></a>
 ### Deployment with Helm Charts
 
