@@ -1,12 +1,12 @@
 [submodule "reference-letters-fastapi-server"]
 	path = reference-letters-fastapi-server
-	url = git@github.com:panagiotis-bellias-it21871/reference-letters-fastapi-server.git
+	url = https://github.com/panagiotis-bellias-it21871/reference-letters-fastapi-server.git
 	branch = main
 [submodule "ansible-reference-letter-code"]
 	path = ansible-reference-letter-code
-	url = git@github.com:panagiotis-bellias-it21871/ansible-reference-letter-code.git
+	url = https://github.com/panagiotis-bellias-it21871/ansible-reference-letter-code.git
 	branch = main
 [submodule "reference-letters-vuejs-client"]
 	path = reference-letters-vuejs-client
-	url = git@github.com:panagiotis-bellias-it21871/reference-letters-vuejs-client.git
+	url = https://github.com/panagiotis-bellias-it21871/reference-letters-vuejs-client.git
 	branch = master
