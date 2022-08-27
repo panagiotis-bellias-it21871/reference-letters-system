@@ -377,4 +377,4 @@ Now the chart can be installed like this:
 ```bash
 helm install <some-name> referenceLettersSystem
 # e.g. helm install rl-system referenceLettersSystem 
-```
+``` 
