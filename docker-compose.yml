@@ -15,9 +15,6 @@ services:
       - FASTAPI_DB_USER=bellias
       - FASTAPI_DB_PASS=pass123
       - FASTAPI_DB_NAME=reference_letters_data
-      - KEYCLOAK_DB_USER=testkeycloakuser
-      - KEYCLOAK_DB_PASS=testkeycloakpassword
-      - KEYCLOAK_DB_NAME=testkeycloakdb
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
       timeout: 30s
