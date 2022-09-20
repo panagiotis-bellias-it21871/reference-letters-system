@@ -82,29 +82,29 @@ need to define in our projects during deployment, like below
 
 ```nano
 # ID                            What is the value?
-app-psql-user                   The backend database user
-app-psql-pass                   The password for the above user
-app-psql-db                     The database we have for the backend functionality
-auth-psql-user                  The keycloak database user
-auth-psql-pass                  The password for the above user
-auth-psql-db                    The database we have users' credentials for the system
+app-db-user                     The backend database user
+app-db-pass                     The password for the above user
+app-db-name                     The database we have for the backend functionality
+auth-secret                     The authentication secret that backend is using
+mail-username                   Mail account's username
+mail-password                   Mail account's app password
+mail-from                       Mail account address
+mail-port                       Mail account's server port (e.g. 587 for gmail)
+mail-server                     Mail account's provider (e.g. smtp.gmail.com for gmail-google)
+mail-from-name                  Mail account's name
+base-endpoint-prefix            REST API's base prefix
+rl-letters-endpoint             REST API's base endpoint for reference letters requests
+auth-endpoint-prefix            REST API's prefix for authentication routes
+auth-login-endpoint             REST API's signin endpoint
 docker-db-url                   The database url where our postgres db is running using docker
-docker-keycloak-server-url      The url where keycloak is running using docker
-docker-keycloak-client-id       The client id we need to connect with keycloak in docker
-docker-keycloak-realm           The realm we connect with keycloak in docker  
-docker-keycloak-client-secret   The client secret we use for authentication with keycloak in docker
-docker-vue-backend-url          The url where backend application is running in docker
+docker-backend-url              The url where backend application is running in docker
 docker-username                 The username we have in the container registry we use to push images
 docker-push-secret              The secret we have in the container registry we use to push images
-docker-container-registry       The container registry you use (e.g. ghcr.io for Github Container Registry). If you use DockerHub, create it with no value
+docker-container-registry       The container registry you use (e.g. ghcr.io for Github Container Registry). If you use DockerHub, create it with value 'https://index.docker.io/v1/'
 docker-backend-prefix-image     The docker image name for the backend application
 docker-frontend-prefix-image    The docker image name for the frontend application
 k8s-db-url                      The database url where our postgres db is running using kubernetes
-k8s-keycloak-server-url         The url where keycloak is running using kubernetes
-k8s-keycloak-client-id          The client id we need to connect with keycloak in kubernetes  
-k8s-keycloak-realm              The realm we connect with keycloak in kubernetes  
-k8s-keycloak-client-secret      The client secret we use for authentication with keycloak in kubernetes 
-k8s-vue-backend-url             The url where backend application is running in kubernetes
+k8s-backend-url                 The url where backend application is running in kubernetes
 ```
 
 <a name="job"></a>

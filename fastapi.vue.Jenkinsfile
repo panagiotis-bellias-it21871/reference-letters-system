@@ -3,12 +3,20 @@ pipeline {
     agent any
 
     environment {
-        APP_DB_USER=credentials('app-psql-user')
-        APP_DB_PASS=credentials('app-psql-pass')
-        APP_DB_NAME=credentials('app-psql-db') /* KeyCloak Stuff
-        AUTH_DB_USER=credentials('auth-psql-user')
-        AUTH_DB_PASS=credentials('auth-psql-pass')
-        AUTH_DB_NAME=credentials('auth-psql-db') */
+        APP_DB_USER=credentials('app-db-user')
+        APP_DB_PASS=credentials('app-db-pass')
+        APP_DB_NAME=credentials('app-db-name')
+        BACKEND_AUTH_SECRET=credentials('auth-secret')
+        MAIL_USERNAME=credentials('mail-username')
+        MAIL_PASSWORD=credentials('mail-password')
+        MAIL_FROM=credentials('mail-from')
+        MAIL_PORT=credentials('mail-port')
+        MAIL_SERVER=credentials('mail-server')
+        MAIL_FROM_NAME=credentials('mail-from-name')
+        BASE_ENDPOINT_PREFIX=credentials('base-endpoint-prefix')
+        RL_LETTERS_ENDPOINT=credentials('rl-letters-endpoint')
+        AUTH_ENDPOINT_PREFIX=credentials('auth-endpoint-prefix')
+        AUTH_LOGIN_ENDPOINT=credentials('auth-login-endpoint')
     }
 
     stages {
@@ -22,49 +30,11 @@ pipeline {
             }
         }
 
-        stage('Unit Testing') {
-            steps {
-                sh '''
-                    echo "BACK END"
-                    cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
-                    virtualenv fvenv -p python3
-                    source fvenv/bin/activate
-                    pip install -r requirements.txt
-
-                    cp ref_letters/.env.example ref_letters/.env
-                    rm test.db || true
-                   '''
-                    // pytest :here problem with endpoints
-                sh '''
-                    echo 'FRONT END'
-                    cd ~/workspace/reference-letters-system/reference-letters-vuejs-client
-                    npm install
-
-                    cp .env.example .env
-                    echo $PWD
-                    echo "Here we have to run unit tests about frontend"
-                   '''
-            }
-        }
-
-        stage('Integration Testing') {
-            steps {
-                sh '''
-                    echo "Here we have to run integration tests"
-                   '''
-            }
-        }
-
         stage('Docker Deployment') {
 
             environment {
-                DB_URL=credentials('docker-db-url') /* KeyCloak Stuff
-                KC_SERVER_URL=credentials('docker-keycloak-server-url')
-                KC_CLIENT_ID=credentials('docker-keycloak-client-id')
-                KC_REALM=credentials('docker-keycloak-realm')
-                KC_CLIENT_SECRET=credentials('docker-keycloak-client-secret') */
-                VUE_APP_BACKEND_URL=credentials('docker-vue-backend-url') /* KeyCloak Stuff
-                VUE_APP_KEYCLOAK_URL=credentials('docker-keycloak-server-url') */
+                DB_URL=credentials('docker-db-url') 
+                VUE_APP_BACKEND_URL=credentials('docker-backend-url')
 
                 DOCKER_USER=credentials('docker-username')
                 DOCKER_PASSWORD=credentials('docker-push-secret')
@@ -93,14 +63,13 @@ pipeline {
                     source ~/.bashrc
 
                     echo 'Security scanning...'
+
+                    grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
+                    grype $DOCKER_FRONTEND_PREFIX > frontend_image_grype_logs.txt
+                    cat grype backend_image_grype_logs.txt | grep 'Critical'
+                    cat grype frontend_image_grype_logs.txt | grep 'Critical'
                     
                 '''
-                /* Issue with grype
-                grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
-                grype $DOCKER_FRONTEND_PREFIX > frontend_image_grype_logs.txt
-                cat grype backend_image_grype_logs.txt | grep 'Critical'
-                cat grype frontend_image_grype_logs.txt | grep 'Critical'
-                */
                 sshagent (credentials: ['ssh-docker-vm']) {
                     sh '''
                         cd ~/workspace/reference-letters-system/ansible-reference-letter-code
@@ -108,13 +77,19 @@ pipeline {
                         -e BACKEND_DIR='reference-letters-fastapi-server' \
                         -e FRONTEND_DIR='reference-letters-vuejs-client' \
                         -e DATABASE_URL=$DB_URL \
-                        -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL
-                    ''' /* KeyCloak Stuff
-                        -e KC_SERVER_URL=$KC_SERVER_URL \
-                        -e KC_CLIENT_ID=$KC_CLIENT_ID \
-                        -e KC_REALM=$KC_REALM \
-                        -e KC_CLIENT_SECRET=$KC_CLIENT_SECRET \
-                        -e VUE_APP_KEYCLOAK_URL=$VUE_APP_KEYCLOAK_URL */
+                        -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL \
+                        -e SECRET=$BACKEND_AUTH_SECRET \
+                        -e MAIL_USERNAME=$MAIL_USERNAME \
+                        -e MAIL_PASSWORD=$MAIL_PASSWORD \
+                        -e MAIL_FROM=$MAIL_FROM \
+                        -e MAIL_PORT=$MAIL_PORT \
+                        -e MAIL_SERVER=$MAIL_SERVER \
+                        -e MAIL_FROM_NAME=$MAIL_FROM_NAME \
+                        -e BASE_ENDPOINT_PREFIX=$BASE_ENDPOINT_PREFIX \
+                        -e RL_LETTERS_ENDPOINT=$RL_LETTERS_ENDPOINT \
+                        -e AUTH_ENDPOINT_PREFIX=$AUTH_ENDPOINT_PREFIX \
+                        -e AUTH_LOGIN_ENDPOINT=$AUTH_LOGIN_ENDPOINT
+                    ''' 
                 }
             }
         }
@@ -122,13 +97,8 @@ pipeline {
         stage('Kubernetes Deployment') {
 
             environment {
-                DB_URL=credentials('k8s-db-url') /* KeyCloak Stuff
-                KC_SERVER_URL=credentials('k8s-keycloak-server-url')
-                KC_CLIENT_ID=credentials('k8s-keycloak-client-id')
-                KC_REALM=credentials('k8s-keycloak-realm')
-                KC_CLIENT_SECRET=credentials('k8s-keycloak-client-secret') */
-                VUE_APP_BACKEND_URL=credentials('k8s-vue-backend-url') /* KeyCloak Stuff
-                VUE_APP_KEYCLOAK_URL=credentials('k8s-keycloak-server-url') */
+                DB_URL=credentials('k8s-db-url') 
+                VUE_APP_BACKEND_URL=credentials('k8s-backend-url')
             }
 
             steps {
@@ -148,12 +118,25 @@ pipeline {
                     -e BACKEND_DIR='reference-letters-fastapi-server' \
                     -e FRONTEND_DIR='reference-letters-vuejs-client' \
                     -e DATABASE_URL=$DB_URL \
-                    -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL
+                    -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL \
+                    -e SECRET=$BACKEND_AUTH_SECRET \
+                    -e MAIL_USERNAME=$MAIL_USERNAME \
+                    -e MAIL_PASSWORD=$MAIL_PASSWORD \
+                    -e MAIL_FROM=$MAIL_FROM \
+                    -e MAIL_PORT=$MAIL_PORT \
+                    -e MAIL_SERVER=$MAIL_SERVER \
+                    -e MAIL_FROM_NAME=$MAIL_FROM_NAME \
+                    -e BASE_ENDPOINT_PREFIX=$BASE_ENDPOINT_PREFIX \
+                    -e RL_LETTERS_ENDPOINT=$RL_LETTERS_ENDPOINT \
+                    -e AUTH_ENDPOINT_PREFIX=$AUTH_ENDPOINT_PREFIX \
+                    -e AUTH_LOGIN_ENDPOINT=$AUTH_LOGIN_ENDPOINT
 
                     cd ~/workspace/reference-letters-system/reference-letters-fastapi-server
                     kubectl create configmap fastapi-config \
                     --from-env-file=ref_letters/.env \
                     --dry-run -o yaml | kubectl apply -f -
+
+                    kubectl create secret docker-registry regcred --docker-server=$DOCKER_SERVER --docker-username=$DOCKER_USER --docker-password=$DOCKER_PASSWORD
 
                     cd k8s
                     kubectl apply -f db/postgres-pvc.yaml
@@ -174,26 +157,6 @@ pipeline {
                     kubectl apply -f vuejs/vuejs-ingress.yaml
 
                     kubectl apply -f vuejs/vuejs-https-ingress.yaml
-
-                   '''
-                   /* KeyCloak Stuff
-                    kubectl create secret generic auth-pg-user \
-                        --from-literal=PGUSER=$AUTH_DB_USER \
-                        --from-literal=PGPASSWORD=$AUTH_DB_PASS \
-                        --from-literal=PGDATABASE=$AUTH_DB_NAME --dry-run -o yaml \
-                        | kubectl apply -f -
-                    kubectl apply -f auth/keycloak-pvc.yaml
-                    kubectl apply -f auth/keycloak-deployment.yaml
-                    kubectl apply -f auth/keycloak-clip.yaml
-
-                   */
-            }
-        }
-
-        stage('Helm Deployment') {
-            steps {
-                sh '''
-                    echo "Here we have to deploy the system using Helm Charts"
                    '''
             }
         }
