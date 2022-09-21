@@ -66,8 +66,8 @@ pipeline {
 
                     grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
                     grype $DOCKER_FRONTEND_PREFIX > frontend_image_grype_logs.txt
-                    cat grype backend_image_grype_logs.txt | grep 'Critical'
-                    cat grype frontend_image_grype_logs.txt | grep 'Critical'
+                    cat backend_image_grype_logs.txt | grep 'Critical'
+                    cat frontend_image_grype_logs.txt | grep 'Critical'
                     
                 '''
                 sshagent (credentials: ['ssh-docker-vm']) {
