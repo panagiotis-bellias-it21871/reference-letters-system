@@ -116,6 +116,7 @@ In the job the pipeline will be the [fastapi.vue.Jenkinsfile](fastapi.vue.Jenkin
 ##### Build stage
 Takes the code from the git repository and its submodules
 
+## MANUALLY
 <a name="ansible-prerequisites"></a>
 ##### Ansible Prerequisites stage
 ```bash

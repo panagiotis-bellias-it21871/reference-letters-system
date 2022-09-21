@@ -73,7 +73,7 @@ pipeline {
                 sshagent (credentials: ['ssh-docker-vm']) {
                     sh '''
                         cd ~/workspace/reference-letters-system/ansible-reference-letter-code
-                        ansible-playbook playbooks/reference-letters-system-install.yml \
+                        ansible-playbook -l docker_group playbooks/reference-letters-system-install.yml \
                         -e BACKEND_DIR='reference-letters-fastapi-server' \
                         -e FRONTEND_DIR='reference-letters-vuejs-client' \
                         -e DATABASE_URL=$DB_URL \
