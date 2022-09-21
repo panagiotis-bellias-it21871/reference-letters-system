@@ -20,11 +20,8 @@ A web system about reference letter handling in the context of DIT HUA Thesis "U
 3.1.3. [Step 3: Add the credentials needed](#credentials)  
 3.1.4. [Create Job](#job)  
 3.1.4.1. [Build stage](#build)  
-3.1.4.2. [Unit Testing stage](#unit-test)  
-3.1.4.3. [Integration Testing stage](#integration-test)  
-3.1.4.4. [Ansible Prerequisites stage](#ansible-prerequisites-stage)   
-3.1.4.5. [Docker Deployment](#j-docker)  
-3.1.4.6. [Kubernetes Deployment](#j-k8s)  
+3.1.4.2. [Docker Deployment](#j-docker)  
+3.1.4.3. [Kubernetes Deployment](#j-k8s)  
 3.2. [Deployment with Docker and docker-compose using Ansible](#docker)  
 3.3. [Deployment with Kubernetes using a piece of Ansible](#k8s)  
 3.3.1. [Using Multiple Namespaces](#multiple-namespaces)   
@@ -118,21 +115,6 @@ In the job the pipeline will be the [fastapi.vue.Jenkinsfile](fastapi.vue.Jenkin
 <a name="build"></a>
 ##### Build stage
 Takes the code from the git repository and its submodules
-
-<a name="unit-test"></a>
-##### Unit Testing stage
-For the backend application activates a virtual environment, installs the requirements, copies the .env.example to use it as .env with some
-demo values for testing and uses pytest so the application can be tested before goes on production.
-For the frontend application installs the requirements, executes the tests so the application can be tested before goes on production.
-
-NOTE: connect to your jenkins vm and do the below line so the test stage can run
-```bash
-<username>@<vm-name>:~$ sudo apt-get install libpcap-dev libpq-dev
-```
-
-<a name="integration-test"></a>
-##### Integration Testing stage
-...
 
 <a name="ansible-prerequisites"></a>
 ##### Ansible Prerequisites stage
