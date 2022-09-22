@@ -169,7 +169,7 @@ In order to deploy our project in Kubernetes cluster, we first need to connect t
 * [Installing microk8s](https://ubuntu.com/tutorials/install-a-local-kubernetes-with-microk8s#2-deploying-microk8s)
 * Do this trick to write less in terminal
 ```bash
-echo "alias k='microk8s.kubectl' " >> ~/.profile
+echo "alias k='microk8s.kubectl' " >> ~/.bashrc
 ```
 The permanent alias will be applied only if you reconnect to your VM.
 
@@ -177,7 +177,7 @@ The permanent alias will be applied only if you reconnect to your VM.
 ```bash
 sudo usermod -a -G microk8s <your-username>
 sudo chown -f -R <your-username> ~/.kube
-microk8s enable dns dashboard storage ingress
+microk8s enable dns dashboard hostpath-storage ingress
 microk8s status
 ```
 
@@ -243,17 +243,6 @@ kubectl create secret generic pg-users \
 --from-literal=FAPASSWORD=<put backend password here> \
 --from-literal=FADBNAME=<put backend database name here>
 
-# Config Map (for database initialization)
-kubectl create configmap pg-init-script \
---from-literal=fastapi.sh=assets/init_db/fastapi.sh
-
-## If you want keycloak service (for now it isn't integrated) run this instead
-kubectl create configmap pg-init-script \
---from-literal=fastapi.sh=assets/init_db/fastapi.sh \
---from-literal=keycloak.sh=assets/init_db/keycloak.sh
-
-!# ISSUE with database initialization for now
-
 # Continue from here
 cd reference-letters-fastapi-server
 
@@ -265,8 +254,12 @@ kubectl create configmap fastapi-config --from-env-file=ref_letters/.env
 cd k8s
 # Persistent Volume Claim
 kubectl apply -f db/postgres-pvc.yaml
-# Deployments
+# Postgres Deployment
 kubectl apply -f db/postgres-deployment.yaml
+# Postgres Initialization
+kubectl get pods
+kubectl exec -it <POD-NAME> -- psql -h localhost -U postgres -p 5432 < ../../assets/init_db/*
+# FastAPI Deployment
 kubectl apply -f fastapi/fastapi-deployment.yaml
 # Services (Cluster IPs)
 kubectl apply -f db/postgres-clip.yaml
