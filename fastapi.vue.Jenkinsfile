@@ -56,6 +56,12 @@ pipeline {
                     docker build --rm -t $DOCKER_FRONTEND_PREFIX:latest -t $DOCKER_FRONTEND_PREFIX:$TAG .
                     docker push $DOCKER_FRONTEND_PREFIX --all-tags
 
+                    echo 'Installing grype...'
+                    cd && mkdir .grype || true
+                    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b ~/.grype
+                    echo 'export PATH="$HOME/.grype:$PATH"' >> ~/.bashrc
+                    source ~/.bashrc
+
                     echo 'Security scanning...'
 
                     grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
@@ -64,13 +70,7 @@ pipeline {
                     cat frontend_image_grype_logs.txt | grep 'Critical' | true
                     
                 '''
-                /*
-                echo 'Installing grype...'
-                    cd && mkdir .grype || true
-                    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b ~/.grype
-                    echo 'export PATH="$HOME/.grype:$PATH"' >> ~/.bashrc
-                    source ~/.bashrc
-                */
+
                 sshagent (credentials: ['ssh-docker-vm']) {
                     sh '''
                         cd ~/workspace/reference-letters-system/ansible-reference-letter-code
