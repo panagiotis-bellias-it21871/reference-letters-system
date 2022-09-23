@@ -56,6 +56,12 @@ pipeline {
                     docker build --rm -t $DOCKER_FRONTEND_PREFIX:latest -t $DOCKER_FRONTEND_PREFIX:$TAG .
                     docker push $DOCKER_FRONTEND_PREFIX --all-tags
 
+                    echo 'Security scanning...'
+
+                    grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
+                    grype $DOCKER_FRONTEND_PREFIX > frontend_image_grype_logs.txt
+                    cat backend_image_grype_logs.txt | grep 'Critical'
+                    cat frontend_image_grype_logs.txt | grep 'Critical' | true
                 '''
 
                 /*
@@ -65,12 +71,7 @@ pipeline {
                     echo 'export PATH="$HOME/.grype:$PATH"' >> ~/.bashrc
                     source ~/.bashrc
 
-                    echo 'Security scanning...'
-
-                    grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
-                    grype $DOCKER_FRONTEND_PREFIX > frontend_image_grype_logs.txt
-                    cat backend_image_grype_logs.txt | grep 'Critical'
-                    cat frontend_image_grype_logs.txt | grep 'Critical' | true
+                    
                 */
 
                 sshagent (credentials: ['ssh-docker-vm']) {
