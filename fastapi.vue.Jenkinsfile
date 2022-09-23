@@ -66,7 +66,7 @@ pipeline {
 
                     grype $DOCKER_BACKEND_PREFIX > backend_image_grype_logs.txt
                     grype $DOCKER_FRONTEND_PREFIX > frontend_image_grype_logs.txt
-                    cat backend_image_grype_logs.txt | grep 'Critical'
+                    cat backend_image_grype_logs.txt | grep 'Critical' | true
                     cat frontend_image_grype_logs.txt | grep 'Critical' | true
                 '''
 
