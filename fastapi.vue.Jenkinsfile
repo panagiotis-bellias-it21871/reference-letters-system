@@ -59,8 +59,7 @@ pipeline {
                     echo 'Installing grype...'
                     cd && mkdir .grype || true
                     curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b ~/.grype
-                    echo 'export PATH="$HOME/.grype:$PATH"' >> ~/.bashrc
-                    source ~/.bashrc
+                    
 
                     echo 'Security scanning...'
 
@@ -69,6 +68,10 @@ pipeline {
                     cat backend_image_grype_logs.txt | grep 'Critical' | true
                     cat frontend_image_grype_logs.txt | grep 'Critical' | true
                 '''
+                /*
+                echo 'export PATH="$HOME/.grype:$PATH"' >> ~/.bashrc
+                    source ~/.bashrc
+                */
 
                 sshagent (credentials: ['ssh-docker-vm']) {
                     sh '''
