@@ -77,6 +77,7 @@ pipeline {
                         -e BACKEND_DIR='reference-letters-fastapi-server' \
                         -e FRONTEND_DIR='reference-letters-vuejs-client' \
                         -e DATABASE_URL=$DB_URL \
+                        -e ORIGIN='http://localhost:8080/' \
                         -e VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL \
                         -e SECRET=$BACKEND_AUTH_SECRET \
                         -e MAIL_USERNAME=$MAIL_USERNAME \
