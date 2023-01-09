@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  VUE_APP_AUTH_ENDPOINT_PREFIX: auth
+  VUE_APP_AUTH_LOGIN_ENDPOINT: jwt/login
+  VUE_APP_BACKEND_URL: http://fastapi-clip:8000
+  VUE_APP_BASE_ENDPOINT_PREFIX: api
+  VUE_APP_RL_LETTERS_ENDPOINT: rl_requests
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-09-27T08:05:21Z"
+  name: vuejs-config
+  namespace: default
+  resourceVersion: "38195"
+  uid: 56c56249-4c24-4125-ac0e-f540b0c7915e
